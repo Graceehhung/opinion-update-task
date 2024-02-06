@@ -1,0 +1,39 @@
+from psychopy import visual, core, event, gui, data
+
+win = visual.Window([800, 600], fullscr=False, allowGUI=True, color="black", units="norm")
+
+
+def display_text(text, wait=True):
+    message = visual.TextStim(win, text=text, color="white", pos=(0, 0))
+    message.draw()
+    win.flip()
+    if wait:
+        event.waitKeys(keyList=["space"])
+
+def get_slider_response(question, labels, min_val, max_val, granularity=1):
+    slider = visual.Slider(win, labels=labels, ticks=range(min_val, max_val + 1), granularity=granularity, pos=(0, -0.4), size=(1.0, 0.1), style='rating', color='LightGray')
+    question_text = visual.TextStim(win, text=question, color="white", pos=(0, 0.2))
+    while slider.getRating() is None:
+        slider.draw()
+        question_text.draw()
+        win.flip()
+        if 'space' in event.getKeys():
+            break  # Allow proceeding without answering for demo purposes
+    return slider.getRating()
+
+display_text("Many scientists have said that by 2100, the average U.S. temperature/sea level will rise at least 6°F/by approximately 3 feet. Press space to continue.")
+
+temp_estimate = get_slider_response("Estimate temperature rise (1-12°F):", [str(x) for x in range(1, 13)], 1, 12)
+confidence = get_slider_response("Your confidence (1-9):", [str(x) for x in range(1, 10)], 1, 9)
+
+display_text("In the last weeks, some prominent scientists have reassessed the science and concluded that the situation is far better/far worse than previously thought. Press space to continue.")
+
+updated_temp_estimate = get_slider_response("Updated estimate temperature rise (1-12°F):", [str(x) for x in range(1, 13)], 1, 12)
+updated_confidence = get_slider_response("Your updated confidence (1-9):", [str(x) for x in range(1, 10)], 1, 9)
+
+display_text("Thank you for participating in the experiment. Press space to exit.", wait=False)
+core.wait(2)  
+win.close()
+
+print(f"Initial Temperature Estimate: {temp_estimate}, Initial Confidence: {confidence}")
+print(f"Updated Temperature Estimate: {updated_temp_estimate}, Updated Confidence: {updated_confidence}")
